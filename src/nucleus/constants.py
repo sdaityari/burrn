@@ -1,33 +1,32 @@
 MAX_CHAR_LENGTH = 100
 MAX_RESOURCE_LENGTH = 250
 MAX_POST_LENGTH = 1000
-
+MAX_CHOICE_LENGTH = 10
 
 GENDER_CHOICES = (
-    ('M', 'Male'),
-    ('F', 'Female'),
-    ('O', 'Others')
+    ('Male', 'Male'),
+    ('Female', 'Female'),
+    ('Others', 'Others')
 )
 
 POST_TYPE_CHOICES = (
-    ('TE', 'Text'),
-    ('IM', 'Image'),
-    ('VI', 'Video')
+    ('Text', 'Text'),
+    ('Image', 'Image'),
+    ('Video', 'Video')
 )
 
 POST_STATUS_CHOICES = (
-    ('AC', 'Active'),
-    ('IN', 'Inactive')
+    ('Active', 'Active'),
+    ('Inactive', 'Inactive')
 )
 
 POST_ACCESS_CHOICES = (
-    ('I', 'Group'),
-    ('II', 'Public'),
-    ('III', 'Members'),
-    ('IV', 'All Friends')
+    ('Group', 'Group'),
+    ('Public', 'Public'),
+    ('Friends', 'Friends')
 )
 
 LIKE_TYPE_CHOICES = (
-    ('I', 'Post'),
-    ('II', 'Comment')
+    ('Post', 'Post'),
+    ('Comment', 'Comment')
 )

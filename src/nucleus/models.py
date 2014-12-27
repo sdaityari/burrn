@@ -8,7 +8,7 @@ class Person(models.Model):
     facebook_id = models.CharField(max_length = C.MAX_CHAR_LENGTH, blank = True, null = True)
     phone_no = models.CharField(max_length = C.MAX_CHAR_LENGTH)
     image = models.CharField(max_length = C.MAX_RESOURCE_LENGTH, blank = True, null = True)
-    gender = models.CharField(max_length = 2, choices = C.GENDER_CHOICES, blank = True, null = True)
+    gender = models.CharField(max_length = C.MAX_CHOICE_LENGTH, choices = C.GENDER_CHOICES, blank = True, null = True)
     age_range = models.CharField(max_length = C.MAX_CHAR_LENGTH, blank = True, null = True)
 
     created = models.DateTimeField(auto_now_add = True)
@@ -32,14 +32,14 @@ class Group(models.Model):
 class Post(models.Model):
     author = models.ForeignKey(Person, related_name = 'post_author')
     target = models.ForeignKey(Person, related_name = 'target_persons')
-    post_type = models.CharField(max_length = 2, choices = C.POST_TYPE_CHOICES)
+    post_type = models.CharField(max_length = C.MAX_CHOICE_LENGTH, choices = C.POST_TYPE_CHOICES)
     text = models.CharField(max_length = C.MAX_POST_LENGTH)
     external_resource = models.CharField(max_length = C.MAX_RESOURCE_LENGTH)
     likes_count = models.IntegerField(default=0)
     comments_count = models.IntegerField(default=0)
     report_count = models.IntegerField(default=0)
-    status = models.CharField(max_length = 2, choices = C.POST_STATUS_CHOICES)
-    access = models.CharField(max_length = 2, choices = C.POST_ACCESS_CHOICES)
+    status = models.CharField(max_length = C.MAX_CHOICE_LENGTH, choices = C.POST_STATUS_CHOICES)
+    access = models.CharField(max_length = C.MAX_CHOICE_LENGTH, choices = C.POST_ACCESS_CHOICES)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -58,7 +58,7 @@ class Like(models.Model):
     person = models.ForeignKey(Person, related_name = 'like_author')
     post = models.ForeignKey(Post, related_name = 'like_post')
     comment = models.ForeignKey(Comment, related_name = 'like_comment')
-    like_type = models.CharField(max_length = 2, choices = C.LIKE_TYPE_CHOICES)
+    like_type = models.CharField(max_length = C.MAX_CHOICE_LENGTH, choices = C.LIKE_TYPE_CHOICES)
 
 class Notification(models.Model):
     person = models.ForeignKey(Person, related_name = 'notif_to')
