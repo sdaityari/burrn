@@ -6,7 +6,7 @@ import nucleus.constants as C
 class Person(models.Model):
     user = models.OneToOneField(User, related_name = 'person_Person')
     facebook_id = models.CharField(max_length = C.MAX_CHAR_LENGTH, blank = True, null = True)
-    phone_no = models.CharField(max_length = C.MAX_CHAR_LENGTH)
+    phone_no = models.CharField(max_length = C.MAX_CHAR_LENGTH, unique = True)
     image = models.CharField(max_length = C.MAX_RESOURCE_LENGTH, blank = True, null = True)
     gender = models.CharField(max_length = C.MAX_CHOICE_LENGTH, choices = C.GENDER_CHOICES, blank = True, null = True)
     age_range = models.CharField(max_length = C.MAX_CHAR_LENGTH, blank = True, null = True)
