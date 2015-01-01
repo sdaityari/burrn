@@ -228,7 +228,7 @@ def groups(request, group_id = None):
                     name = name,
                     image = image,
                     admin = admin,
-                    member_count = 0
+                    member_count = 1
                 )
 
                 group.members.add(admin)
@@ -245,6 +245,55 @@ def groups(request, group_id = None):
                     person = Person.objects.get(user = request.user)
                     groups = Group.objects.filter(members = person).values('name', 'member_count', 'image', 'admin__id')
                 return HttpResponse(json.dumps(list(groups)))
+
+    except KeyError:
+        return HttpResponse(not_logged_in(), status = 403)
+    except Exception as e:
+        print (e)
+        return HttpResponse(unknown_error())
+
+def group_members(request, group_id):
+    try:
+        group = Group.objects.get(pk = int(group_id))
+        members = group.members.all()
+        if request.user.is_staff or Person.objects.get(user = request.user) in members:
+            return HttpResponse(json.dumps(list(
+                    members.values( 'user__username', 'user__email', 'phone_no', 'user__first_name',
+                        'user__last_name', 'image', 'gender', 'age_range')
+                )))
+    except KeyError:
+        return HttpResponse(not_logged_in(), status = 403)
+    except Exception as e:
+        print (e)
+        return HttpResponse(unknown_error())
+
+def group_add(request, group_id, member_id):
+    try:
+        group = Group.objects.get(pk = int(group_id))
+        members = group.members.all()
+        member_to_add = get_object_or_404(Person, pk = int(member_id))
+        if (request.user.is_staff or Person.objects.get(user = request.user) in members) and member_to_add not in members:
+            group.members.add(member_to_add)
+            group.member_count += 1
+            group.save()
+            return HttpResponse(success_message())
+
+    except KeyError:
+        return HttpResponse(not_logged_in(), status = 403)
+    except Exception as e:
+        print (e)
+        return HttpResponse(unknown_error())
+
+def group_remove(request, group_id, member_id):
+    try:
+        group = Group.objects.get(pk = int(group_id))
+        members = group.members.all()
+        member_to_remove = get_object_or_404(Person, pk = int(member_id))
+        if (request.user.is_staff or member_to_remove.user == request.user or request.user == group.admin.user) and member_to_remove in members:
+            group.members.remove(member_to_remove)
+            group.member_count -= 1
+            group.save()
+            return HttpResponse(success_message())
 
     except KeyError:
         return HttpResponse(not_logged_in(), status = 403)
