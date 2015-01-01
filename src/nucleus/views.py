@@ -148,14 +148,103 @@ def users(request, user_id = None):
                 person.is_verified = True
                 person.save()
 
-                return HttpResponse(success_message())
+                return HttpResponse(success_message(person.pk))
 
             elif request.method == "GET":
                 # Give list of users
                 if request.user.is_staff:
-                    return HttpResponse(serializers.serialize("json", Person.objects.all()))
+                    return HttpResponse(serializers.serialize("json",
+                        list(Person.objects.all().values('user__username',
+                            'user__email', 'phone_no', 'user__first_name',
+                            'user__last_name', 'image', 'gender', 'age_range')
+                        )
+                    ))
                 else:
                     return HttpResponse(no_access(), status = 404)
+
+    except KeyError:
+        return HttpResponse(not_logged_in(), status = 403)
+    except Exception as e:
+        print (e)
+        return HttpResponse(unknown_error())
+
+@csrf_exempt
+def groups(request, group_id = None):
+    try:
+        if group_id:
+            try:
+                group_id = int(group_id)
+                group = Group.objects.filter(pk = group_id)
+
+                # GET a Group
+                if request.method == "GET":
+                    if not request.user.is_staff and (Person.objects.get(user = request.user) not in group[0].members.all()):
+                        return HttpResponse(no_access())
+                    return HttpResponse(json.dumps(list(group.values('name', 'image', 'member_count', 'admin__id'))))
+
+                # Update Group
+                if request.method == "PUT":
+
+                    # Workaround
+                    coerce_put_post(request)
+
+                    keys = request.PUT.keys()
+
+                    name = request.PUT['name']
+                    image = request.PUT['image'] if 'image' in keys else ''
+
+                    if request.user == group.admin.user:
+                        group.name = name
+                        group.image = image
+                        group.save()
+                    else:
+                        return HttpResponse(no_access())
+
+                    return HttpResponse(success_message())
+
+                if request.method == "DELETE":
+                    group = Group.objects.filter(pk = group_id)
+                    if request.user.is_staff or (request.user == group.admin.user):
+                         group.delete()
+                         return HttpResponse(success_message())
+
+            # If invalid user_id
+            except Exception as e:
+                print (e)
+                return HttpResponse(no_access())
+
+        # user_id not specified
+        else:
+            if request.method == "POST":
+
+                keys = request.POST.keys()
+
+                name = request.POST['name']
+                image = request.POST['image'] if 'image' in keys else ''
+
+                admin = Person.objects.get(user = request.user)
+
+                group = Group.objects.create(
+                    name = name,
+                    image = image,
+                    admin = admin,
+                    member_count = 0
+                )
+
+                group.members.add(admin)
+                group.save()
+
+                # Get data
+                return HttpResponse(success_message(id = group.pk))
+
+            elif request.method == "GET":
+                # Give list of users
+                if request.user.is_staff:
+                    groups = Group.objects.all().values('name', 'member_count', 'image', 'admin__id')
+                else:
+                    person = Person.objects.get(user = request.user)
+                    groups = Group.objects.filter(members = person).values('name', 'member_count', 'image', 'admin__id')
+                return HttpResponse(json.dumps(list(groups)))
 
     except KeyError:
         return HttpResponse(not_logged_in(), status = 403)

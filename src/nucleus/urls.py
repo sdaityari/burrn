@@ -5,4 +5,6 @@ urlpatterns = patterns ('nucleus.views',
     (r'^logout/$', 'logout_view'),
     (r'^users/$', 'users'),
     (r'^users/(?P<user_id>[\w\-]+)/$', 'users'),
+    (r'^groups/$', 'groups'),
+    (r'^groups/(?P<group_id>[\w\-]+)/$', 'groups'),
 )

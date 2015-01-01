@@ -15,10 +15,13 @@ def not_logged_in():
             "message": "Please login"
         })
 
-def success_message():
-    return json.dumps({
+def success_message(id = None):
+    d = {
             "message": "Action completed successfully"
-        })
+        }
+    if id:
+        d["id"] = id
+    return json.dumps(d)
 
 def custom_message(message = ""):
     return json.dumps({
