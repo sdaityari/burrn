@@ -61,6 +61,9 @@ class Like(models.Model):
     comment = models.ForeignKey(Comment, related_name = 'like_comment')
     like_type = models.CharField(max_length = C.MAX_CHOICE_LENGTH, choices = C.LIKE_TYPE_CHOICES)
 
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
 class Notification(models.Model):
     person = models.ForeignKey(Person, related_name = 'notif_to')
     action_user = models.ForeignKey(Person, related_name = 'notif_from')
