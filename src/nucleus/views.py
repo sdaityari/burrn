@@ -168,6 +168,18 @@ def users(request, user_id = None):
         print (e)
         return HttpResponse(unknown_error())
 
+def users_contact(request, contact):
+    try:
+        return HttpResponse(json.dumps(list(Person.objects.filter(phone_no = contact).values('user__username',
+                'user__email', 'phone_no', 'user__first_name',
+                'user__last_name', 'image', 'gender', 'age_range')
+        )))
+    except KeyError:
+        return HttpResponse(not_logged_in(), status = 403)
+    except Exception as e:
+        print (e)
+        return HttpResponse(unknown_error())
+
 @csrf_exempt
 def groups(request, group_id = None):
     try:
@@ -393,7 +405,7 @@ def posts(request, post_id = None):
                                 'external_resource', 'comments_count', 'report_count', 'status', 'access')
                 else:
                     person = Person.objects.get(user = request.user)
-                    posts = Post.objects.filter(author = person).values('author__id', 'target__id', 'post_type', 'text',
+                    posts = Post.objects.filter(author = person).values('target__id', 'post_type', 'text',
                                 'external_resource', 'likes_count', 'comments_count', 'report_count', 'status', 'access')
                 return HttpResponse(json.dumps(list(posts)))
 
@@ -409,12 +421,17 @@ def post_likes(request, post_id):
     '''
     pass
 
-def post_comments(request, post_id):
+def post_comments(request, post_id, comment_id = None):
     pass
 
 def posts_about_me(request, post_id):
-    #     person = Person.objects.get(user = request.user)
-    #     posts = Post.objects.filter(author = person).values('author__id', 'target__id', 'post_type', 'text'
-    #                 'external_resource', 'likes_count', 'comments_count', 'report_count', 'status', 'access')
-    # return HttpResponse(json.dumps(list(posts)))
-    pass
+    try:
+        person = Person.objects.get(user = request.user)
+        posts = Post.objects.filter(target = person).values('target__id', 'post_type', 'text',
+                    'external_resource', 'likes_count', 'comments_count', 'report_count', 'status', 'access')
+        return HttpResponse(json.dumps(list(posts)))
+    except KeyError:
+        return HttpResponse(not_logged_in(), status = 403)
+    except Exception as e:
+        print (e)
+        return HttpResponse(unknown_error())
