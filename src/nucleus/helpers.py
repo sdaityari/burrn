@@ -65,3 +65,12 @@ def coerce_put_post(request):
             request.META['REQUEST_METHOD'] = 'PUT'
 
         request.PUT = request.POST
+
+def user_access(post, user):
+    '''
+        Check if user has access to post
+    '''
+    if (user.pk, ) in post.group.members.all().values_list('user__pk') or group.access == 'Public':
+        return True
+    else:
+        return False

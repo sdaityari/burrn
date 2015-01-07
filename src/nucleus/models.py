@@ -40,6 +40,7 @@ class Post(models.Model):
     report_count = models.IntegerField(default=0)
     status = models.CharField(max_length = C.MAX_CHOICE_LENGTH, choices = C.POST_STATUS_CHOICES)
     access = models.CharField(max_length = C.MAX_CHOICE_LENGTH, choices = C.POST_ACCESS_CHOICES)
+    group = models.ForeignKey(Group, related_name = 'post_group')
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)

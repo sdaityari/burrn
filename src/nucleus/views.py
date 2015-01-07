@@ -300,3 +300,121 @@ def group_remove(request, group_id, member_id):
     except Exception as e:
         print (e)
         return HttpResponse(unknown_error())
+
+@csrf_exempt
+def posts(request, post_id = None):
+    try:
+        if post_id:
+            try:
+                post_id = int(post_id)
+                post = Post.objects.filter(pk = post_id)
+
+                # GET a post
+                if request.method == "GET":
+                    if not user_access(post[0], request.user):
+                        return HttpResponse(no_access())
+                    return HttpResponse(json.dumps(list(post.values('author__id', 'target__id', 'post_type', 'text',
+                                    'external_resource', 'likes_count', 'comments_count', 'report_count', 'status', 'access'
+                        ))))
+
+                # Update post
+                if request.method == "PUT":
+
+                    # Workaround
+                    coerce_put_post(request)
+
+                    keys = request.PUT.keys()
+
+                    author = Person.objects.get(user = request.user)
+
+                    post = Post.objects.get(pk = post_id)
+
+                    if post.author != author:
+                        return HttpResponse(no_access(), status = 400)
+
+                    post.target = Person.objects.get(pk = int(request.PUT['target']))
+                    post.post_type = request.PUT['type']
+                    post.text = request.PUT['text']
+                    post.external_resource = request.PUT['external_resource'] if 'external_resource' in keys else ''
+                    post.group = Group.objects.get(pk = int(request.PUT['group']))
+                    post.access = request.PUT['access'] if 'access' in keys else 'Group'
+                    post.status = request.PUT['status'] if 'status' in keys else 'Active'
+
+                    post.save()
+
+                    return HttpResponse(success_message())
+
+                if request.method == "DELETE":
+                    post = Post.objects.filter(pk = post_id)
+                    if request.user.is_staff or (request.user == post[0].author.user):
+                         post.delete()
+                         return HttpResponse(success_message())
+
+            # If invalid user_id
+            except Exception as e:
+                print (e)
+                return HttpResponse(no_access())
+
+        # user_id not specified
+        else:
+            if request.method == "POST":
+
+                keys = request.POST.keys()
+
+                author = Person.objects.get(user = request.user)
+                target = Person.objects.get(pk = int(request.POST['target']))
+                post_type = request.POST['type']
+                text = request.POST['text']
+                external_resource = request.POST['external_resource'] if 'external_resource' in keys else ''
+                group = Group.objects.get(pk = request.POST['group'])
+                access = request.POST['access'] if 'access' in keys else 'Group'
+
+                status = 'Active'
+
+                post = Post.objects.create(
+                    author = author,
+                    target = target,
+                    post_type = post_type,
+                    text = text,
+                    external_resource = external_resource,
+                    group = group,
+                    status = status,
+                    access = access
+                )
+
+                post.save()
+
+                return HttpResponse(success_message(id = post.pk))
+
+            elif request.method == "GET":
+                # Give list of users
+                if request.user.is_staff:
+                    posts = Post.objects.all().values('author__id', 'target__id', 'post_type', 'text', 'likes_count',
+                                'external_resource', 'comments_count', 'report_count', 'status', 'access')
+                else:
+                    person = Person.objects.get(user = request.user)
+                    posts = Post.objects.filter(author = person).values('author__id', 'target__id', 'post_type', 'text',
+                                'external_resource', 'likes_count', 'comments_count', 'report_count', 'status', 'access')
+                return HttpResponse(json.dumps(list(posts)))
+
+    except KeyError:
+        return HttpResponse(not_logged_in(), status = 403)
+    except Exception as e:
+        print (e)
+        return HttpResponse(unknown_error())
+
+def post_likes(request, post_id):
+    '''
+        list of likes for a post
+    '''
+    pass
+
+def post_comments(request, post_id):
+    pass
+
+def posts_about_me(request, post_id):
+    #     person = Person.objects.get(user = request.user)
+    #     posts = Post.objects.filter(author = person).values('author__id', 'target__id', 'post_type', 'text'
+    #                 'external_resource', 'likes_count', 'comments_count', 'report_count', 'status', 'access')
+    # return HttpResponse(json.dumps(list(posts)))
+    pass
