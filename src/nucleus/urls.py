@@ -13,7 +13,7 @@ urlpatterns = patterns ('nucleus.views',
     (r'^groups/(?P<group_id>[\w\-]+)/remove/(?P<member_id>[\w\-]+)/$', 'group_remove'),
     (r'^posts/$', 'posts'),
     (r'^posts/(?P<post_id>[\w\-]+)/$', 'posts'),
-    (r'^posts/me/$', 'posts_about_me'),
+    (r'^posts_about_me/$', 'posts_about_me'),
     (r'^posts/(?P<post_id>[\w\-]+)/comments/$', 'post_comments'),
     (r'^posts/(?P<post_id>[\w\-]+)/comments/(?P<comment_id>[\w\-]+)/$', 'post_comments'),
 )

@@ -153,7 +153,7 @@ def users(request, user_id = None):
             elif request.method == "GET":
                 # Give list of users
                 if request.user.is_staff:
-                    return HttpResponse(serializers.serialize("json",
+                    return HttpResponse(json.dumps(
                         list(Person.objects.all().values('id', 'user__username',
                             'user__email', 'phone_no', 'user__first_name',
                             'user__last_name', 'image', 'gender', 'age_range')
@@ -437,6 +437,8 @@ def post_comments(request, post_id, comment_id = None):
                         return HttpResponse(json.dumps(list(comment.values('id', 'post__id', 'author__id', 'text',
                                     'user_icon', 'likes_count', 'report_count'
                         ))))
+                    else:
+                        return HttpResponse(no_access(), status = 403)
 
                 # Update comment
                 if request.method == "PUT":
@@ -504,7 +506,7 @@ def post_comments(request, post_id, comment_id = None):
         print (e)
         return HttpResponse(unknown_error())
 
-def posts_about_me(request, post_id):
+def posts_about_me(request):
     try:
         person = Person.objects.get(user = request.user)
         posts = Post.objects.filter(target = person).values('target__id', 'post_type', 'text',
