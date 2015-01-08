@@ -46,6 +46,7 @@ class Post(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
 class Comment(models.Model):
+    post = models.ForeignKey(Post, related_name = 'comment_post')
     author = models.ForeignKey(Person, related_name = 'comment_author')
     text = models.CharField(max_length = C.MAX_POST_LENGTH)
     user_icon = models.CharField(max_length = C.MAX_CHAR_LENGTH)

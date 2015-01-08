@@ -70,7 +70,9 @@ def user_access(post, user):
     '''
         Check if user has access to post
     '''
-    if (user.pk, ) in post.group.members.all().values_list('user__pk') or group.access == 'Public':
+    if user.is_staff:
+        return True
+    elif (user.pk, ) in post.group.members.all().values_list('user__pk') or group.access == 'Public':
         return True
     else:
         return False
