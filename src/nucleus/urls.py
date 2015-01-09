@@ -16,4 +16,5 @@ urlpatterns = patterns ('nucleus.views',
     (r'^posts_about_me/$', 'posts_about_me'),
     (r'^posts/(?P<post_id>[\w\-]+)/comments/$', 'post_comments'),
     (r'^posts/(?P<post_id>[\w\-]+)/comments/(?P<comment_id>[\w\-]+)/$', 'post_comments'),
+    (r'^feed/$', 'feed'),
 )

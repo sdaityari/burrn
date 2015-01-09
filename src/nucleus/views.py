@@ -517,3 +517,15 @@ def posts_about_me(request):
     except Exception as e:
         print (e)
         return HttpResponse(unknown_error())
+
+def feed(request):
+    try:
+        person = Person.objects.get(user = request.user)
+        posts = Post.objects.filter(group__members = person).values('id', 'target__id', 'post_type', 'text',
+                    'external_resource', 'likes_count', 'comments_count', 'report_count', 'status', 'access')
+        return HttpResponse(json.dumps(list(posts)))
+    except KeyError:
+        return HttpResponse(not_logged_in(), status = 403)
+    except Exception as e:
+        print (e)
+        return HttpResponse(unknown_error())
