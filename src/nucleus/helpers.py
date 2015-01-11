@@ -76,3 +76,9 @@ def user_access(post, user):
         return True
     else:
         return False
+
+def get_dummy_username(phone_no):
+    return "username" + str(phone_no)
+
+def get_dummy_email(phone_no):
+    return "email" + str(phone_no) + "@burrn.it"

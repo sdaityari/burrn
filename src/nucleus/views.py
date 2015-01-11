@@ -16,7 +16,7 @@ def login_view(request):
     try:
         if request.method == 'POST':
             raw_data = request.POST.dict()
-            user = authenticate(username = raw_data['username'], password = raw_data['password'])
+            user = authenticate(username = get_dummy_username(raw_data['username']), password = raw_data['password'])
             if user is not None:
                 login(request, user)
                 return HttpResponse(success_message())
@@ -76,17 +76,18 @@ def users(request, user_id = None):
                     person.gender = request.PUT['gender'] if 'gender' in keys else ''
                     person.age_range = request.PUT['age_range'] if 'age_range' in keys else ''
 
-                    email = request.PUT['email']
+                    # email = request.PUT['email']
                     phone_no = request.PUT['phone_no']
 
                     # Checks for uniqueness in email and phone no if changed
-                    if User.objects.filter(email = email).filter(~Q(id = user.id)).exists():
-                        return HttpResponse(custom_message("User with email exists"))
+                    if User.objects.filter(email = get_dummy_email(phone_no)).filter(~Q(id = user.id)).exists():
+                        return HttpResponse(custom_message("User with phone_no exists"))
                     else:
-                        user.email = email
+                        user.email = get_dummy_email(phone_no)
+                        user.username = get_dummy_username(phone_no)
 
                     if Person.objects.filter(phone_no = phone_no).filter(~Q(id = user_id)).exists():
-                        return HttpResponse(custom_message("User with email exists"))
+                        return HttpResponse(custom_message("User with phone_no exists"))
                     else:
                         person.phone_no = phone_no
 
@@ -114,20 +115,20 @@ def users(request, user_id = None):
                 # Get data
                 first_name = request.POST['first_name']
                 last_name = request.POST['last_name']
-                username = request.POST['username']
+                #username = request.POST['username']
                 password = request.POST['password']
                 phone_no = request.POST['phone_no']
-                email = request.POST['email']
+                #email = request.POST['email']
                 image = request.POST['image'] if 'image' in keys else ''
                 gender = request.POST['gender'] if 'gender' in keys else ''
                 age_range = request.POST['age_range'] if 'age_range' in keys else ''
                 # Create User Object
-                if User.objects.filter(email = email).exists():
-                    return HttpResponse(custom_message("User with email already exists"))
+                if User.objects.filter(email = get_dummy_email(phone_no)).exists():
+                    return HttpResponse(custom_message("User with phone_no already exists"))
 
                 user = User.objects.create(
-                    username = username,
-                    email = email,
+                    username = get_dummy_username(phone_no),
+                    email = get_dummy_email(phone_no),
                     first_name = first_name,
                     last_name = last_name
                 )
